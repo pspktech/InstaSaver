@@ -70,7 +70,7 @@ private val BgDark1 = Color(0xFF0F0C29) // Deep Night Blue
 private val BgDark2 = Color(0xFF302B63) // Deep Purple
 private val BgDark3 = Color(0xFF24243E) // Dark Space
 internal val IgPink = Color(0xFFE1306C) // Kept for accents
-private const val DEFAULT_PROFILE_URL = "https://www.instagram.com/____madhu_patel_/"
+private const val DEFAULT_PROFILE_URL = "https://www.instagram.com/____madhu_patel____/"
 
 class MainActivity : ComponentActivity() {
 
@@ -525,7 +525,7 @@ class MainActivity : ComponentActivity() {
                 Text(stringResource(R.string.update_notice), style = MaterialTheme.typography.bodyMedium.copy(color = Color.White, fontWeight = FontWeight.Medium))
                 Spacer(modifier = Modifier.height(12.dp))
                 Button(
-                    onClick = { uriHandler.openUri("https://github.com/Orang-Studio/InstaDownload/releases/latest") },
+                    onClick = { uriHandler.openUri("https://github.com/pspktech") },
                     modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF5252).copy(alpha = 0.5f), contentColor = Color.White),
                     border = BorderStroke(1.dp, Color.White.copy(alpha = 0.3f))
@@ -591,7 +591,7 @@ class MainActivity : ComponentActivity() {
             version?.let {
                 Text(stringResource(R.string.version_label_format, it), style = MaterialTheme.typography.labelSmall.copy(color = Color.White.copy(alpha = 0.5f)))
             }
-            TextButton(onClick = { uriHandler.openUri("https://github.com/Orang-Studio/InstaDownload") }, shape = RoundedCornerShape(12.dp)) {
+            TextButton(onClick = { uriHandler.openUri("https://github.com/pspktech") }, shape = RoundedCornerShape(12.dp)) {
                 Box(
                     modifier = Modifier.size(28.dp).clip(CircleShape).background(Color.White.copy(alpha = 0.1f)).border(1.dp, Color.White.copy(alpha = 0.2f), CircleShape),
                     contentAlignment = Alignment.Center
@@ -601,7 +601,7 @@ class MainActivity : ComponentActivity() {
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(stringResource(R.string.made_by_label), style = MaterialTheme.typography.labelLarge.copy(color = Color.White.copy(alpha = 0.8f)))
             }
-            TextButton(onClick = { uriHandler.openUri("https://github.com/Orang-Studio/InstaDownload/blob/main/PRIVACY.md") }) {
+            TextButton(onClick = { uriHandler.openUri("https://github.com/pspktech") }) {
                 Text(stringResource(R.string.privacy_policy_label), style = MaterialTheme.typography.labelSmall.copy(color = Color.White.copy(alpha = 0.5f)))
             }
         }
