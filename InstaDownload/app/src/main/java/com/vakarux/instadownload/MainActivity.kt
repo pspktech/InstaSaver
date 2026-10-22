@@ -23,8 +23,10 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
@@ -63,16 +65,12 @@ import kotlinx.coroutines.withContext
 import java.util.regex.Pattern
 import kotlin.math.roundToLong
 
-// Instagram brand gradient colors
-private val IgPurple = Color(0xFF833AB4)
-internal val IgPink   = Color(0xFFE1306C)
-private val IgOrange = Color(0xFFF77737)
-
-// Dark equivalents (desaturated per MD3 dark mode guidance)
-private val IgPurpleDark = Color(0xFF2D1B2E)
-private val IgPinkDark   = Color(0xFF4A1428)
-private val IgOrangeDark = Color(0xFF3D1A0A)
-private const val DEFAULT_PROFILE_URL = "https://www.instagram.com/____madhu_patel____/"
+// Premium Glassmorphism Gradient Background Colors
+private val BgDark1 = Color(0xFF0F0C29) // Deep Night Blue
+private val BgDark2 = Color(0xFF302B63) // Deep Purple
+private val BgDark3 = Color(0xFF24243E) // Dark Space
+internal val IgPink = Color(0xFFE1306C) // Kept for accents
+private const val DEFAULT_PROFILE_URL = "https://www.instagram.com/____madhu_patel_/"
 
 class MainActivity : ComponentActivity() {
 
@@ -101,7 +99,7 @@ class MainActivity : ComponentActivity() {
 
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
-    ) { _ -> /* permission result handled inline */ }
+    ) { _ -> }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -112,11 +110,9 @@ class MainActivity : ComponentActivity() {
         setContent {
             val settings = appSettings
             var selectedTheme by remember { mutableStateOf(settings.theme) }
-            val useDarkTheme = when (selectedTheme) {
-                AppTheme.SYSTEM -> androidx.compose.foundation.isSystemInDarkTheme()
-                AppTheme.LIGHT -> false
-                AppTheme.DARK -> true
-            }
+            // Forced dark theme for Premium Glass look
+            val useDarkTheme = true 
+            
             InstaDownloadTheme(darkTheme = useDarkTheme) {
                 InstagramDownloaderScreen(
                     initialUrl = sharedUrl.value.url.ifBlank { DEFAULT_PROFILE_URL },
@@ -201,13 +197,16 @@ class MainActivity : ComponentActivity() {
 
         val isStory = isStoryUrl(url.trim())
 
-        val igGradient = Brush.verticalGradient(
-            colors = if (useDarkTheme) {
-                listOf(IgPurpleDark, IgPinkDark, IgOrangeDark)
-            } else {
-                listOf(IgPurple, IgPink, IgOrange)
-            }
+        // Premium Dark Gradient
+        val bgGradient = Brush.verticalGradient(
+            colors = listOf(BgDark1, BgDark2, BgDark3)
         )
+
+        // Glassmorphism Modifier
+        val glassModifier = Modifier
+            .clip(RoundedCornerShape(24.dp))
+            .background(Color.White.copy(alpha = 0.08f))
+            .border(BorderStroke(1.dp, Color.White.copy(alpha = 0.15f)), RoundedCornerShape(24.dp))
 
         LaunchedEffect(url, targetWidth) {
             val trimmed = url.trim()
@@ -253,476 +252,311 @@ class MainActivity : ComponentActivity() {
         Scaffold(
             containerColor = Color.Transparent,
             modifier = Modifier
-                .background(igGradient)
+                .background(bgGradient)
                 .imePadding()
         ) { innerPadding ->
-            AnimatedVisibility(
-                visible = isLoading,
-                enter = fadeIn(tween(150)),
-                exit = fadeOut(tween(150)),
-                modifier = Modifier
-                    .padding(innerPadding)
-                    .fillMaxWidth()
-            ) {
-                LinearProgressIndicator(
-                    modifier = Modifier.fillMaxWidth(),
-                    color = Color.White,
-                    trackColor = Color.White.copy(alpha = 0.3f)
-                )
-            }
+        
+        Column(
+    modifier = Modifier
+        .fillMaxSize()
+        .padding(innerPadding)
+        .verticalScroll(rememberScrollState())
+        .padding(horizontal = 24.dp),
+    horizontalAlignment = Alignment.CenterHorizontally,
+    verticalArrangement = Arrangement.Center
+) {
 
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding)
-                    .verticalScroll(rememberScrollState())
-                    .padding(horizontal = 24.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                Spacer(modifier = Modifier.height(48.dp))
+    Spacer(modifier = Modifier.height(48.dp))
 
-                Box(
-                    modifier = Modifier
-                        .size(88.dp)
-                        .clip(RoundedCornerShape(24.dp))
-                        .background(Color.White.copy(alpha = 0.2f)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = AppIcons.Download,
-                        contentDescription = null,
-                        tint = Color.White,
-                        modifier = Modifier.size(44.dp)
-                    )
-                }
+    // ── Hero (Glass Effect) ─────────────────────────────
+    Box(
+        modifier = Modifier
+            .size(88.dp)
+            .clip(RoundedCornerShape(24.dp))
+            .background(Color.White.copy(alpha = 0.1f))
+            .border(1.dp, Color.White.copy(alpha = 0.2f), RoundedCornerShape(24.dp)),
+        contentAlignment = Alignment.Center
+    ) {
+        Icon(
+            imageVector = AppIcons.Download,
+            contentDescription = null,
+            tint = Color.White,
+            modifier = Modifier.size(44.dp)
+        )
+    }
 
-                Spacer(modifier = Modifier.height(20.dp))
+    Spacer(modifier = Modifier.height(20.dp))
 
-                Text(
-                    text = stringResource(R.string.app_name),
-                    style = MaterialTheme.typography.headlineMedium.copy(
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White
-                    ),
-                    textAlign = TextAlign.Center
-                )
+    Text(
+        text = stringResource(R.string.app_name),
+        style = MaterialTheme.typography.headlineMedium.copy(
+            fontWeight = FontWeight.Bold,
+            color = Color.White
+        ),
+        textAlign = TextAlign.Center
+    )
 
-                Text(
-                    text = stringResource(R.string.app_tagline),
-                    style = MaterialTheme.typography.bodyLarge.copy(
-                        color = Color.White.copy(alpha = 0.8f)
-                    ),
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(top = 4.dp)
-                )
+    Text(
+        text = stringResource(R.string.app_tagline),
+        style = MaterialTheme.typography.bodyLarge.copy(
+            color = Color.White.copy(alpha = 0.7f)
+        ),
+        textAlign = TextAlign.Center,
+        modifier = Modifier.padding(top = 4.dp)
+    )
 
-                Spacer(modifier = Modifier.height(40.dp))
+    Spacer(modifier = Modifier.height(40.dp))
 
-                ElevatedCard(
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(24.dp),
-                    elevation = CardDefaults.elevatedCardElevation(defaultElevation = 6.dp),
-                    colors = CardDefaults.elevatedCardColors(
-                        containerColor = colorScheme.surface
-                    )
-                ) {
-                    Column(modifier = Modifier.padding(24.dp)) {
-                        val pasteDescription = stringResource(R.string.paste_clipboard_description)
-                        OutlinedTextField(
-                            value = url,
-                            onValueChange = {
-                                url = it
-                                if (urlError != null) urlError = null
+    // ── Input card (Glass Effect) ─────────────────────
+    Box(modifier = Modifier.fillMaxWidth().then(glassModifier)) {
+        Column(modifier = Modifier.padding(24.dp)) {
+
+            val pasteDescription = stringResource(R.string.paste_clipboard_description)
+            OutlinedTextField(
+                value = url,
+                onValueChange = {
+                    url = it
+                    if (urlError != null) urlError = null
+                    media = null
+                    fullError = null
+                },
+                label = { Text(stringResource(R.string.url_field_label)) },
+                placeholder = { Text(stringResource(R.string.url_field_placeholder), color = Color.White.copy(alpha = 0.4f)) },
+                isError = urlError != null,
+                supportingText = {
+                    if (urlError != null) {
+                        Text(urlError!!, color = Color(0xFFFF5252))
+                    }
+                },
+                trailingIcon = {
+                    IconButton(
+                        onClick = {
+                            val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                            val pasted = clipboard.primaryClip?.getItemAt(0)?.text?.toString() ?: ""
+                            if (pasted.isNotEmpty()) {
+                                url = pasted
+                                urlError = null
                                 media = null
                                 fullError = null
-                            },
-                            label = { Text(stringResource(R.string.url_field_label)) },
-                            placeholder = { Text(stringResource(R.string.url_field_placeholder)) },
-                            isError = urlError != null,
-                            supportingText = {
-                                if (urlError != null) {
-                                    Text(
-                                        urlError!!,
-                                        color = colorScheme.error
-                                    )
-                                }
-                            },
-                            trailingIcon = {
-                                IconButton(
-                                    onClick = {
-                                        val clipboard = context
-                                            .getSystemService(Context.CLIPBOARD_SERVICE)
-                                                as ClipboardManager
-                                        val pasted = clipboard.primaryClip
-                                            ?.getItemAt(0)?.text?.toString() ?: ""
-                                        if (pasted.isNotEmpty()) {
-                                            url = pasted
-                                            urlError = null
-                                            media = null
-                                            fullError = null
-                                        }
-                                    },
-                                    modifier = Modifier.semantics {
-                                        contentDescription = pasteDescription
-                                    }
-                                ) {
-                                    Icon(
-                                        imageVector = AppIcons.ContentPaste,
-                                        contentDescription = null,
-                                        tint = colorScheme.primary
-                                    )
-                                }
-                            },
-                            modifier = Modifier.fillMaxWidth(),
-                            singleLine = false,
-                            maxLines = 3,
-                            enabled = !isSaving,
-                            shape = RoundedCornerShape(16.dp),
-                            colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = IgPink,
-                                focusedLabelColor = IgPink,
-                                cursorColor = IgPink,
-                            )
-                        )
-
-                        Spacer(modifier = Modifier.height(20.dp))
-
-                        AnimatedVisibility(
-                            visible = isStory,
-                            enter = fadeIn(tween(200)),
-                            exit = fadeOut(tween(200))
-                        ) {
-                            Card(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(bottom = 20.dp),
-                                shape = RoundedCornerShape(16.dp),
-                                colors = CardDefaults.cardColors(
-                                    containerColor = IgOrange.copy(alpha = 0.15f)
-                                )
-                            ) {
-                                Column(modifier = Modifier.padding(16.dp)) {
-                                    Text(
-                                        stringResource(R.string.story_not_supported_title),
-                                        style = MaterialTheme.typography.labelLarge.copy(
-                                            color = IgOrange,
-                                            fontWeight = FontWeight.Bold
-                                        )
-                                    )
-                                    Text(
-                                        stringResource(R.string.story_not_supported_body),
-                                        style = MaterialTheme.typography.bodySmall.copy(
-                                            color = colorScheme.onSurfaceVariant
-                                        ),
-                                        modifier = Modifier.padding(top = 4.dp)
-                                    )
-                                }
                             }
-                        }
-
-                        Button(
-                            onClick = {
-                                val trimmed = url.trim()
-                                when {
-                                    trimmed.isBlank() -> urlError = emptyUrlStr
-                                    !isValidInstagramUrl(trimmed) ->
-                                        urlError = invalidUrlStr
-                                    Build.VERSION.SDK_INT < Build.VERSION_CODES.Q
-                                            && !checkPermissions() -> requestPermissions()
-                                    InstagramDownloader.isProfileUrl(trimmed) ->
-                                        profileToBrowse = InstagramDownloader.extractProfileUsername(trimmed)
-                                    else -> coroutineScope.launch {
-                                        fullError = null
-                                        val items = media ?: run {
-                                            isLoading = true
-                                            val fetched = runCatching {
-                                                withContext(Dispatchers.IO) {
-                                                    InstagramDownloader.getMediaItems(trimmed, settings.targetWidth())
-                                                }
-                                            }
-                                            isLoading = false
-                                            if (fetched.isFailure) {
-                                                fullError = fetched.exceptionOrNull()?.message ?: genericErrorStr
-                                                return@launch
-                                            }
-                                            fetched.getOrThrow().also { media = it }
-                                        }
-                                        val itemsToSave = items.filterIndexed { i, _ ->
-                                            i !in deselectedIndices
-                                        }
-                                        hapticStart(context, settings.hapticsEnabled)
-                                        isSaving = true
-                                        var fellBackToDefaultFolder = false
-                                        val dlResult = runCatching {
-                                            withContext(Dispatchers.IO) {
-                                                itemsToSave.forEach { item ->
-                                                    if (saveToDownloads(item, context, settings).fellBackToDefaultFolder) {
-                                                        fellBackToDefaultFolder = true
-                                                    }
-                                                }
-                                            }
-                                        }
-                                        isSaving = false
-                                        if (fellBackToDefaultFolder) {
-                                            onFolderAccessLost()
-                                        }
-                                        if (dlResult.isSuccess) {
-                                            hapticComplete(context, settings.hapticsEnabled)
-                                            downloadComplete = true
-                                            if (fellBackToDefaultFolder) {
-                                                fullError = folderAccessLostStr
-                                            }
-                                            delay(2500)
-                                            downloadComplete = false
-                                            media = null
-                                            deselectedIndices = emptySet()
-                                            onDownloadsSaved()
-                                        } else {
-                                            fullError = dlResult.exceptionOrNull()?.message ?: downloadFailedStr
-                                        }
-                                    }
-                                }
-                            },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(56.dp),
-                            enabled = !isSaving && !isStory && media?.size != deselectedIndices.size,
-                            shape = RoundedCornerShape(16.dp),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = IgPink,
-                                contentColor = Color.White,
-                                disabledContainerColor = IgPink.copy(alpha = 0.5f),
-                                disabledContentColor = Color.White.copy(alpha = 0.6f)
-                            ),
-                            elevation = ButtonDefaults.buttonElevation(
-                                defaultElevation = 4.dp,
-                                pressedElevation = 2.dp
-                            )
-                        ) {
-                            when {
-                                isSaving -> {
-                                    CircularProgressIndicator(
-                                        color = Color.White,
-                                        modifier = Modifier.size(20.dp),
-                                        strokeWidth = 2.5.dp
-                                    )
-                                    Spacer(modifier = Modifier.width(12.dp))
-                                    Text(
-                                        stringResource(R.string.saving_label),
-                                        style = MaterialTheme.typography.labelLarge
-                                    )
-                                }
-                                downloadComplete -> {
-                                    Icon(
-                                        imageVector = AppIcons.Download,
-                                        contentDescription = null,
-                                        modifier = Modifier.size(20.dp)
-                                    )
-                                    Spacer(modifier = Modifier.width(8.dp))
-                                    Text(
-                                        stringResource(R.string.saved_label),
-                                        style = MaterialTheme.typography.labelLarge.copy(
-                                            fontWeight = FontWeight.Bold
-                                        )
-                                    )
-                                }
-                                else -> {
-                                    val isProfile = InstagramDownloader.isProfileUrl(url.trim())
-                                    Icon(
-                                        imageVector = if (isProfile) AppIcons.Image else AppIcons.Download,
-                                        contentDescription = null,
-                                        modifier = Modifier.size(20.dp)
-                                    )
-                                    Spacer(modifier = Modifier.width(8.dp))
-                                    Text(
-                                        stringResource(if (isProfile) R.string.open_profile_label else R.string.download_label),
-                                        style = MaterialTheme.typography.labelLarge.copy(
-                                            fontWeight = FontWeight.Bold
-                                        )
-                                    )
-                                }
-                            }
-                        }
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                AnimatedVisibility(
-                    visible = media != null,
-                    enter = fadeIn(tween(200)),
-                    exit = fadeOut(tween(200))
-                ) {
-                    val items = media ?: emptyList()
-                    ElevatedCard(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 16.dp),
-                        shape = RoundedCornerShape(24.dp),
-                        colors = CardDefaults.elevatedCardColors(
-                            containerColor = colorScheme.surface
-                        )
+                        },
+                        modifier = Modifier.semantics { contentDescription = pasteDescription }
                     ) {
-                        Column(modifier = Modifier.padding(20.dp)) {
-                            Text(
-                                (if (items.size > 1) stringResource(R.string.items_count_format, items.size) else stringResource(R.string.preview_label)) +
-                                    (items.firstOrNull { it.reduced }
-                                        ?.let { stringResource(R.string.data_saver_suffix_format, it.width) } ?: ""),
-                                style = MaterialTheme.typography.labelLarge.copy(
-                                    fontWeight = FontWeight.Bold,
-                                    color = colorScheme.onSurface
-                                )
-                            )
-                            Spacer(modifier = Modifier.height(12.dp))
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .horizontalScroll(rememberScrollState()),
-                                horizontalArrangement = Arrangement.spacedBy(12.dp)
-                            ) {
-                                items.forEachIndexed { index, item ->
-                                    MediaThumbnail(
-                                        item = item,
-                                        isCarousel = items.size > 1,
-                                        isSelected = index !in deselectedIndices,
-                                        onToggleSelected = {
-                                            deselectedIndices = if (index in deselectedIndices)
-                                                deselectedIndices - index else deselectedIndices + index
-                                        }
-                                    )
-                                }
-                            }
-                        }
+                        Icon(AppIcons.ContentPaste, contentDescription = null, tint = Color.White)
                     }
-                }
+                },
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = false,
+                maxLines = 3,
+                enabled = !isSaving,
+                shape = RoundedCornerShape(16.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = Color.White.copy(alpha = 0.6f),
+                    unfocusedBorderColor = Color.White.copy(alpha = 0.2f),
+                    focusedLabelColor = Color.White,
+                    unfocusedLabelColor = Color.White.copy(alpha = 0.6f),
+                    focusedTextColor = Color.White,
+                    unfocusedTextColor = Color.White,
+                    cursorColor = Color.White,
+                    focusedContainerColor = Color.Transparent,
+                    unfocusedContainerColor = Color.Transparent
+                )
+            )
 
-                AnimatedVisibility(
-                    visible = fullError != null,
-                    enter = fadeIn(tween(200)),
-                    exit = fadeOut(tween(200))
+            Spacer(modifier = Modifier.height(20.dp))
+
+            AnimatedVisibility(visible = isStory, enter = fadeIn(tween(200)), exit = fadeOut(tween(200))) {
+                Card(
+                    modifier = Modifier.fillMaxWidth().padding(bottom = 20.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.1f)),
+                    border = BorderStroke(1.dp, Color.White.copy(alpha = 0.2f))
                 ) {
-                    ElevatedCard(
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(16.dp),
-                        colors = CardDefaults.elevatedCardColors(
-                            containerColor = colorScheme.errorContainer
-                        )
-                    ) {
-                        Column(modifier = Modifier.padding(16.dp)) {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                val errorLabel = stringResource(R.string.error_title)
-                                Text(
-                                    errorLabel,
-                                    style = MaterialTheme.typography.labelLarge.copy(
-                                        color = colorScheme.onErrorContainer,
-                                        fontWeight = FontWeight.Bold
-                                    )
-                                )
-                                Row {
-                                    val copyErrorDescription = stringResource(R.string.copy_error_description)
-                                    IconButton(onClick = {
-                                        val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                                        val clip = android.content.ClipData.newPlainText(errorLabel, fullError)
-                                        clipboard.setPrimaryClip(clip)
-                                    }) {
-                                        Icon(
-                                            imageVector = AppIcons.ContentCopy,
-                                            contentDescription = copyErrorDescription,
-                                            tint = colorScheme.onErrorContainer,
-                                            modifier = Modifier.size(18.dp)
-                                        )
-                                    }
-                                    TextButton(onClick = { fullError = null }) {
-                                        Text(
-                                            stringResource(R.string.dismiss_label),
-                                            style = MaterialTheme.typography.labelMedium.copy(
-                                                color = colorScheme.onErrorContainer
-                                            )
-                                        )
-                                    }
-                                }
-                            }
-                            SelectionContainer {
-                                Text(
-                                    text = fullError ?: "",
-                                    style = MaterialTheme.typography.bodySmall.copy(
-                                        color = colorScheme.onErrorContainer
-                                    ),
-                                    modifier = Modifier.padding(top = 4.dp)
-                                )
-                            }
-
-                            Spacer(modifier = Modifier.height(12.dp))
-
-                            Text(
-                                stringResource(R.string.update_notice),
-                                style = MaterialTheme.typography.bodyMedium.copy(
-                                    color = colorScheme.onErrorContainer,
-                                    fontWeight = FontWeight.Medium
-                                )
-                            )
-
-                            Spacer(modifier = Modifier.height(12.dp))
-
-                            Button(
-                                onClick = {
-                                    uriHandler.openUri("https://github.com/pspktech")
-                                },
-                                modifier = Modifier.fillMaxWidth(),
-                                shape = RoundedCornerShape(12.dp),
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = colorScheme.error,
-                                    contentColor = colorScheme.onError
-                                )
-                            ) {
-                                Icon(
-                                    imageVector = AppIcons.Download,
-                                    contentDescription = null,
-                                    modifier = Modifier.size(18.dp)
-                                )
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text(
-                                    stringResource(R.string.update_button),
-                                    style = MaterialTheme.typography.labelLarge.copy(
-                                        fontWeight = FontWeight.Bold
-                                    )
-                                )
-                            }
-                        }
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Text(stringResource(R.string.story_not_supported_title), style = MaterialTheme.typography.labelLarge.copy(color = Color.White, fontWeight = FontWeight.Bold))
+                        Text(stringResource(R.string.story_not_supported_body), style = MaterialTheme.typography.bodySmall.copy(color = Color.White.copy(alpha = 0.7f)), modifier = Modifier.padding(top = 4.dp))
                     }
                 }
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                GitHubCredit()
-
-                Spacer(modifier = Modifier.height(24.dp))
             }
 
+            // ── Glass Button ──────────────────────────────
+            Button(
+                onClick = {
+                    val trimmed = url.trim()
+                    when {
+                        trimmed.isBlank() -> urlError = emptyUrlStr
+                        !isValidInstagramUrl(trimmed) -> urlError = invalidUrlStr
+                        Build.VERSION.SDK_INT < Build.VERSION_CODES.Q && !checkPermissions() -> requestPermissions()
+                        InstagramDownloader.isProfileUrl(trimmed) -> profileToBrowse = InstagramDownloader.extractProfileUsername(trimmed)
+                        else -> coroutineScope.launch {
+                            fullError = null
+                            val items = media ?: run {
+                                isLoading = true
+                                val fetched = runCatching {
+                                    withContext(Dispatchers.IO) { InstagramDownloader.getMediaItems(trimmed, settings.targetWidth()) }
+                                }
+                                isLoading = false
+                                if (fetched.isFailure) {
+                                    fullError = fetched.exceptionOrNull()?.message ?: genericErrorStr
+                                    return@launch
+                                }
+                                fetched.getOrThrow().also { media = it }
+                            }
+                            val itemsToSave = items.filterIndexed { i, _ -> i !in deselectedIndices }
+                            hapticStart(context, settings.hapticsEnabled)
+                            isSaving = true
+                            var fellBackToDefaultFolder = false
+                            val dlResult = runCatching {
+                                withContext(Dispatchers.IO) {
+                                    itemsToSave.forEach { item ->
+                                        if (saveToDownloads(item, context, settings).fellBackToDefaultFolder) {
+                                            fellBackToDefaultFolder = true
+                                        }
+                                    }
+                                }
+                            }
+                            isSaving = false
+                            if (fellBackToDefaultFolder) onFolderAccessLost()
+                            if (dlResult.isSuccess) {
+                                hapticComplete(context, settings.hapticsEnabled)
+                                downloadComplete = true
+                                if (fellBackToDefaultFolder) fullError = folderAccessLostStr
+                                delay(2500)
+                                downloadComplete = false
+                                media = null
+                                deselectedIndices = emptySet()
+                                onDownloadsSaved()
+                            } else {
+                                fullError = dlResult.exceptionOrNull()?.message ?: downloadFailedStr
+                            }
+                        }
+                    }
+                },
+                modifier = Modifier.fillMaxWidth().height(56.dp),
+                enabled = !isSaving && !isStory && media?.size != deselectedIndices.size,
+                shape = RoundedCornerShape(16.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color.White.copy(alpha = 0.15f),
+                    contentColor = Color.White,
+                    disabledContainerColor = Color.White.copy(alpha = 0.05f),
+                    disabledContentColor = Color.White.copy(alpha = 0.4f)
+                ),
+                border = BorderStroke(1.dp, Color.White.copy(alpha = 0.3f)),
+                elevation = ButtonDefaults.buttonElevation(0.dp, 0.dp, 0.dp, 0.dp, 0.dp)
+            ) {
+                if (isSaving) {
+                    CircularProgressIndicator(color = Color.White, modifier = Modifier.size(20.dp), strokeWidth = 2.5.dp)
+                    Spacer(modifier = Modifier.width(12.dp))
+                    Text(stringResource(R.string.saving_label), style = MaterialTheme.typography.labelLarge)
+                } else if (downloadComplete) {
+                    Icon(AppIcons.Download, contentDescription = null, modifier = Modifier.size(20.dp))
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(stringResource(R.string.saved_label), style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold))
+                } else {
+                    val isProfile = InstagramDownloader.isProfileUrl(url.trim())
+                    Icon(if (isProfile) AppIcons.Image else AppIcons.Download, contentDescription = null, modifier = Modifier.size(20.dp))
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(stringResource(if (isProfile) R.string.open_profile_label else R.string.download_label), style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold))
+                }
+            }
+        }
+    }
+
+    Spacer(modifier = Modifier.height(16.dp))
+
+    // ── Preview (Glass Effect) ────────────────────────
+    AnimatedVisibility(visible = media != null, enter = fadeIn(tween(200)), exit = fadeOut(tween(200))) {
+        val items = media ?: emptyList()
+        Box(modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp).then(glassModifier)) {
+            Column(modifier = Modifier.padding(20.dp)) {
+                Text(
+                    (if (items.size > 1) stringResource(R.string.items_count_format, items.size) else stringResource(R.string.preview_label)) +
+                            (items.firstOrNull { it.reduced }?.let { stringResource(R.string.data_saver_suffix_format, it.width) } ?: ""),
+                    style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold, color = Color.White)
+                )
+                Spacer(modifier = Modifier.height(12.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    items.forEachIndexed { index, item ->
+                        MediaThumbnail(
+                            item = item,
+                            isCarousel = items.size > 1,
+                            isSelected = index !in deselectedIndices,
+                            onToggleSelected = {
+                                deselectedIndices = if (index in deselectedIndices) deselectedIndices - index else deselectedIndices + index
+                            }
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    // ── Error card (Glass Effect) ──────────────────────
+    AnimatedVisibility(visible = fullError != null, enter = fadeIn(tween(200)), exit = fadeOut(tween(200))) {
+        Box(
+            modifier = Modifier.fillMaxWidth()
+                .clip(RoundedCornerShape(24.dp))
+                .background(Color(0xFFFF5252).copy(alpha = 0.15f))
+                .border(BorderStroke(1.dp, Color(0xFFFF5252).copy(alpha = 0.4f)), RoundedCornerShape(24.dp))
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                    Text(stringResource(R.string.error_title), style = MaterialTheme.typography.labelLarge.copy(color = Color(0xFFFF5252), fontWeight = FontWeight.Bold))
+                    Row {
+                        IconButton(onClick = {
+                            val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                            val clip = android.content.ClipData.newPlainText("Error", fullError)
+                            clipboard.setPrimaryClip(clip)
+                        }) {
+                            Icon(AppIcons.ContentCopy, contentDescription = stringResource(R.string.copy_error_description), tint = Color.White, modifier = Modifier.size(18.dp))
+                        }
+                        TextButton(onClick = { fullError = null }) {
+                            Text(stringResource(R.string.dismiss_label), style = MaterialTheme.typography.labelMedium.copy(color = Color.White))
+                        }
+                    }
+                }
+                SelectionContainer {
+                    Text(text = fullError ?: "", style = MaterialTheme.typography.bodySmall.copy(color = Color.White.copy(alpha = 0.9f)), modifier = Modifier.padding(top = 4.dp))
+                }
+                Spacer(modifier = Modifier.height(12.dp))
+                Text(stringResource(R.string.update_notice), style = MaterialTheme.typography.bodyMedium.copy(color = Color.White, fontWeight = FontWeight.Medium))
+                Spacer(modifier = Modifier.height(12.dp))
+                Button(
+                    onClick = { uriHandler.openUri("https://github.com/Orang-Studio/InstaDownload/releases/latest") },
+                    modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF5252).copy(alpha = 0.5f), contentColor = Color.White),
+                    border = BorderStroke(1.dp, Color.White.copy(alpha = 0.3f))
+                ) {
+                    Icon(AppIcons.Download, contentDescription = null, modifier = Modifier.size(18.dp))
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(stringResource(R.string.update_button), style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold))
+                }
+            }
+        }
+    }
+
+    Spacer(modifier = Modifier.height(16.dp))
+    GitHubCredit()
+    Spacer(modifier = Modifier.height(24.dp))
+}
+
             Row(
-                modifier = Modifier
-                    .padding(innerPadding)
-                    .fillMaxWidth()
-                    .padding(8.dp),
+                modifier = Modifier.padding(innerPadding).fillMaxWidth().padding(8.dp),
                 horizontalArrangement = Arrangement.End
             ) {
                 TextButton(onClick = onOpenLibrary) {
-                    Text(
-                        stringResource(R.string.downloads_label),
-                        color = Color.White
-                    )
+                    Text(stringResource(R.string.downloads_label), color = Color.White)
                 }
                 IconButton(
                     onClick = { showSettings = true },
                     colors = IconButtonDefaults.iconButtonColors(
-                        containerColor = Color.Black.copy(alpha = 0.18f),
+                        containerColor = Color.White.copy(alpha = 0.1f),
                         contentColor = Color.White
-                    )
+                    ),
+                    modifier = Modifier.border(1.dp, Color.White.copy(alpha = 0.2f), CircleShape)
                 ) {
                     Icon(AppIcons.Settings, contentDescription = stringResource(R.string.settings_content_description))
                 }
@@ -745,74 +579,37 @@ class MainActivity : ComponentActivity() {
     }
 
     @Composable
-    private fun isSystemInDarkMode(): Boolean =
-        androidx.compose.foundation.isSystemInDarkTheme()
+    private fun isSystemInDarkMode(): Boolean = androidx.compose.foundation.isSystemInDarkTheme()
 
     @Composable
     fun GitHubCredit() {
         val uriHandler = LocalUriHandler.current
         val context = LocalContext.current
-        val version = remember {
-            runCatching {
-                context.packageManager.getPackageInfo(context.packageName, 0).versionName
-            }.getOrNull()
-        }
+        val version = remember { runCatching { context.packageManager.getPackageInfo(context.packageName, 0).versionName }.getOrNull() }
 
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             version?.let {
-                Text(
-                    stringResource(R.string.version_label_format, it),
-                    style = MaterialTheme.typography.labelSmall.copy(
-                        color = Color.White.copy(alpha = 0.6f)
-                    )
-                )
+                Text(stringResource(R.string.version_label_format, it), style = MaterialTheme.typography.labelSmall.copy(color = Color.White.copy(alpha = 0.5f)))
             }
-            TextButton(
-                onClick = { uriHandler.openUri("https://github.com/pspktech") },
-                shape = RoundedCornerShape(12.dp)
-            ) {
+            TextButton(onClick = { uriHandler.openUri("https://github.com/Orang-Studio/InstaDownload") }, shape = RoundedCornerShape(12.dp)) {
                 Box(
-                    modifier = Modifier
-                        .size(28.dp)
-                        .clip(CircleShape)
-                        .background(Color.White.copy(alpha = 0.2f)),
+                    modifier = Modifier.size(28.dp).clip(CircleShape).background(Color.White.copy(alpha = 0.1f)).border(1.dp, Color.White.copy(alpha = 0.2f), CircleShape),
                     contentAlignment = Alignment.Center
                 ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.github),
-                        contentDescription = stringResource(R.string.github_content_description),
-                        tint = Color.White,
-                        modifier = Modifier.size(16.dp)
-                    )
+                    Icon(painterResource(id = R.drawable.github), contentDescription = stringResource(R.string.github_content_description), tint = Color.White, modifier = Modifier.size(16.dp))
                 }
                 Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    stringResource(R.string.made_by_label),
-                    style = MaterialTheme.typography.labelLarge.copy(
-                        color = Color.White.copy(alpha = 0.85f)
-                    )
-                )
+                Text(stringResource(R.string.made_by_label), style = MaterialTheme.typography.labelLarge.copy(color = Color.White.copy(alpha = 0.8f)))
             }
-            TextButton(onClick = { uriHandler.openUri("https://github.com/pspktech/InstaSaver/blob/main/PRIVACY.md") }) {
-                Text(
-                    stringResource(R.string.privacy_policy_label),
-                    style = MaterialTheme.typography.labelSmall.copy(
-                        color = Color.White.copy(alpha = 0.6f)
-                    )
-                )
+            TextButton(onClick = { uriHandler.openUri("https://github.com/Orang-Studio/InstaDownload/blob/main/PRIVACY.md") }) {
+                Text(stringResource(R.string.privacy_policy_label), style = MaterialTheme.typography.labelSmall.copy(color = Color.White.copy(alpha = 0.5f)))
             }
         }
     }
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    private fun SettingsDialog(
-        settings: AppSettings,
-        selectedFolderName: String,
-        onChooseFolder: () -> Unit,
-        onThemeChanged: (AppTheme) -> Unit,
-        onDismiss: () -> Unit
-    ) {
+    private fun SettingsDialog(settings: AppSettings, selectedFolderName: String, onChooseFolder: () -> Unit, onThemeChanged: (AppTheme) -> Unit, onDismiss: () -> Unit) {
         var quality by remember { mutableStateOf(settings.quality) }
         var customWidth by remember { mutableIntStateOf(settings.customWidth) }
         var haptics by remember { mutableStateOf(settings.hapticsEnabled) }
@@ -820,150 +617,62 @@ class MainActivity : ComponentActivity() {
 
         AlertDialog(
             onDismissRequest = onDismiss,
-            title = { Text(stringResource(R.string.settings_title)) },
+            containerColor = Color(0xFF24243E), // Glass background for dialog
+            title = { Text(stringResource(R.string.settings_title), color = Color.White) },
             text = {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .verticalScroll(rememberScrollState())
-                ) {
+                Column(modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState())) {
                     SettingsHeading(stringResource(R.string.download_location_heading))
-                    Text(selectedFolderName, style = MaterialTheme.typography.bodyLarge)
-                    OutlinedButton(
-                        onClick = onChooseFolder,
-                        modifier = Modifier.fillMaxWidth().padding(top = 8.dp)
-                    ) { Text(stringResource(R.string.choose_folder_button)) }
+                    Text(selectedFolderName, style = MaterialTheme.typography.bodyLarge, color = Color.White)
+                    OutlinedButton(onClick = onChooseFolder, modifier = Modifier.fillMaxWidth().padding(top = 8.dp)) { Text(stringResource(R.string.choose_folder_button), color = Color.White) }
                     SettingsHeading(stringResource(R.string.download_quality_heading))
                     DownloadQuality.entries.forEach { option ->
-                        SettingsRadio(
-                            stringResource(option.labelRes),
-                            stringResource(option.descriptionRes),
-                            quality == option
-                        ) {
+                        SettingsRadio(stringResource(option.labelRes), stringResource(option.descriptionRes), quality == option) {
                             quality = option
                             settings.quality = option
                         }
                     }
-                    if (quality == DownloadQuality.CUSTOM) {
-                        var expanded by remember { mutableStateOf(false) }
-                        ExposedDropdownMenuBox(
-                            expanded = expanded,
-                            onExpandedChange = { expanded = it },
-                            modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp)
-                        ) {
-                            OutlinedTextField(
-                                value = stringResource(R.string.resolution_px_format, customWidth),
-                                onValueChange = {},
-                                readOnly = true,
-                                label = { Text(stringResource(R.string.resolution_label)) },
-                                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded) },
-                                modifier = Modifier.fillMaxWidth().menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
-                            )
-                            ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-                                listOf(1080, 720, 640, 480, 320, 240).forEach { width ->
-                                    DropdownMenuItem(
-                                        text = { Text(stringResource(R.string.resolution_px_format, width)) },
-                                        onClick = {
-                                            customWidth = width
-                                            settings.customWidth = width
-                                            expanded = false
-                                        }
-                                    )
-                                }
-                            }
-                        }
-                    }
                     SettingsHeading(stringResource(R.string.appearance_heading))
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
+                    Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                         Column(modifier = Modifier.weight(1f)) {
-                            Text(stringResource(R.string.haptic_feedback_label), style = MaterialTheme.typography.bodyLarge)
-                            Text(stringResource(R.string.haptic_feedback_description), style = MaterialTheme.typography.bodySmall)
+                            Text(stringResource(R.string.haptic_feedback_label), style = MaterialTheme.typography.bodyLarge, color = Color.White)
+                            Text(stringResource(R.string.haptic_feedback_description), style = MaterialTheme.typography.bodySmall, color = Color.White.copy(alpha = 0.7f))
                         }
-                        Switch(
-                            checked = haptics,
-                            onCheckedChange = {
-                                haptics = it
-                                settings.hapticsEnabled = it
-                            }
-                        )
-                    }
-                    AppTheme.entries.forEach { option ->
-                        SettingsRadio(stringResource(option.labelRes), null, theme == option) {
-                            theme = option
-                            settings.theme = option
-                            onThemeChanged(option)
-                        }
+                        Switch(checked = haptics, onCheckedChange = { haptics = it; settings.hapticsEnabled = it })
                     }
                 }
             },
-            confirmButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.done_button)) } }
+            confirmButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.done_button), color = Color.White) } }
         )
     }
 
     @Composable
     private fun SettingsHeading(text: String) {
-        Text(
-            text,
-            style = MaterialTheme.typography.labelLarge,
-            color = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.padding(top = 12.dp, bottom = 4.dp)
-        )
+        Text(text, style = MaterialTheme.typography.labelLarge, color = Color.White, modifier = Modifier.padding(top = 12.dp, bottom = 4.dp))
     }
 
     @Composable
-    private fun SettingsRadio(
-        title: String,
-        description: String?,
-        selected: Boolean,
-        onClick: () -> Unit
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable(onClick = onClick)
-                .padding(vertical = 6.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            RadioButton(selected = selected, onClick = onClick)
+    private fun SettingsRadio(title: String, description: String?, selected: Boolean, onClick: () -> Unit) {
+        Row(modifier = Modifier.fillMaxWidth().clickable(onClick = onClick).padding(vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
+            RadioButton(selected = selected, onClick = onClick, colors = RadioButtonDefaults.colors(selectedColor = Color.White, unselectedColor = Color.White.copy(alpha = 0.5f)))
             Column(modifier = Modifier.padding(start = 8.dp)) {
-                Text(title, style = MaterialTheme.typography.bodyLarge)
-                description?.let { Text(it, style = MaterialTheme.typography.bodySmall) }
+                Text(title, style = MaterialTheme.typography.bodyLarge, color = Color.White)
+                description?.let { Text(it, style = MaterialTheme.typography.bodySmall, color = Color.White.copy(alpha = 0.7f)) }
             }
         }
     }
 
     @Composable
-    private fun MediaThumbnail(
-        item: MediaResult,
-        isCarousel: Boolean = false,
-        isSelected: Boolean = true,
-        onToggleSelected: () -> Unit = {}
-    ) {
+    private fun MediaThumbnail(item: MediaResult, isCarousel: Boolean = false, isSelected: Boolean = true, onToggleSelected: () -> Unit = {}) {
         val previewUrl = item.previewUrl
         var loadFailed by remember(previewUrl) { mutableStateOf(false) }
         val bitmap by produceState<ImageBitmap?>(initialValue = null, previewUrl) {
-            if (previewUrl == null) {
-                value = null
-                return@produceState
-            }
-            val bmp = withContext(Dispatchers.IO) {
-                runCatching {
-                    val bytes = InstagramDownloader.fetchBytes(previewUrl)
-                    android.graphics.BitmapFactory.decodeByteArray(bytes, 0, bytes.size)?.asImageBitmap()
-                }.getOrNull()
-            }
+            if (previewUrl == null) { value = null; return@produceState }
+            val bmp = withContext(Dispatchers.IO) { runCatching { val bytes = InstagramDownloader.fetchBytes(previewUrl); android.graphics.BitmapFactory.decodeByteArray(bytes, 0, bytes.size)?.asImageBitmap() }.getOrNull() }
             if (bmp == null) loadFailed = true
             value = bmp
         }
         val context = LocalContext.current
-        val sizeBytes by produceState(-1L, item.url) {
-            value = withContext(Dispatchers.IO) {
-                runCatching { InstagramDownloader.contentLength(item.url) }.getOrDefault(-1L)
-            }
-        }
+        val sizeBytes by produceState(-1L, item.url) { value = withContext(Dispatchers.IO) { runCatching { InstagramDownloader.contentLength(item.url) }.getOrDefault(-1L) } }
         val meta = listOfNotNull(
             item.takeIf { it.width in 1 until Int.MAX_VALUE && it.height > 0 }?.let { "${it.width}×${it.height}" },
             item.durationSec.takeIf { it > 0 }?.let { DateUtils.formatElapsedTime(it.roundToLong()) },
@@ -973,40 +682,73 @@ class MainActivity : ComponentActivity() {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Box(modifier = Modifier.size(width = 120.dp, height = 158.dp)) {
                 Box(
-                    modifier = Modifier
-                        .align(Alignment.BottomCenter)
-                        .size(width = 120.dp, height = 150.dp)
+                    modifier = Modifier.align(Alignment.BottomCenter).size(width = 120.dp, height = 150.dp)
                         .clip(RoundedCornerShape(16.dp))
-                        .background(Color.Black.copy(alpha = 0.15f))
+                        .background(Color.White.copy(alpha = 0.1f))
+                        .border(1.dp, Color.White.copy(alpha = 0.2f), RoundedCornerShape(16.dp))
                         .clickable(enabled = isCarousel, onClick = onToggleSelected),
                     contentAlignment = Alignment.Center
                 ) {
                     val bmp = bitmap
                     when {
-                        bmp != null -> Image(
-                            bitmap = bmp,
-                            contentDescription = stringResource(
-                                if (item.isVideo) R.string.video_preview_description else R.string.image_preview_description
-                            )
-                        )
-                        loadFailed -> {
-                            Icon(
-                                imageVector = AppIcons.BrokenImage,
-                                contentDescription = null,
-                                tint = Color.White.copy(alpha = 0.7f),
-                                modifier = Modifier.size(36.dp)
-                            )
-                        }
-                        else -> {
-                            CircularProgressIndicator(
-                                modifier = Modifier.size(28.dp),
-                                color = Color.White.copy(alpha = 0.7f),
-                                strokeWidth = 2.dp
-                            )
+                        bmp != null -> Image(bitmap = bmp, contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize().alpha(if (isCarousel && !isSelected) 0.35f else 1f))
+                        previewUrl == null || loadFailed -> Icon(imageVector = if (item.isVideo) AppIcons.Movie else AppIcons.Image, contentDescription = null, tint = Color.White.copy(alpha = 0.7f), modifier = Modifier.size(36.dp))
+                        else -> CircularProgressIndicator(color = Color.White, strokeWidth = 2.dp, modifier = Modifier.size(24.dp))
+                    }
+                    if (item.isVideo && bmp != null) {
+                        Box(modifier = Modifier.size(40.dp).clip(CircleShape).background(Color.Black.copy(alpha = 0.45f)), contentAlignment = Alignment.Center) {
+                            Icon(imageVector = AppIcons.PlayArrow, contentDescription = null, tint = Color.White, modifier = Modifier.size(24.dp))
                         }
                     }
                 }
+                if (isCarousel) {
+                    Checkbox(checked = isSelected, onCheckedChange = { onToggleSelected() }, colors = CheckboxDefaults.colors(checkedColor = IgPink, uncheckedColor = Color.White), modifier = Modifier.align(Alignment.TopEnd))
+                }
+            }
+            if (meta.isNotEmpty()) {
+                Text(meta.joinToString(" · "), style = MaterialTheme.typography.labelSmall, color = Color.White.copy(alpha = 0.8f), textAlign = TextAlign.Center, maxLines = 2, modifier = Modifier.width(120.dp).padding(top = 4.dp))
             }
         }
     }
+
+    private fun isValidInstagramUrl(url: String): Boolean = Pattern.compile("^https?://(www\\.)?(instagram\\.com|instagr\\.am)/(p|reel|tv)/[A-Za-z0-9_-]+").matcher(url).find() || isStoryUrl(url) || InstagramDownloader.isProfileUrl(url)
+    private fun isStoryUrl(url: String): Boolean = Pattern.compile("^https?://(www\\.)?instagram\\.com/stories/[A-Za-z0-9._]+").matcher(url).find()
+    private fun checkPermissions(): Boolean = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
+    private fun requestPermissions() { requestPermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE) }
+
+    private fun hapticStart(context: Context, enabled: Boolean = true) {
+        if (!enabled) return
+        val v = vibrator(context)
+        if (!v.hasVibrator()) return
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            v.vibrate(VibrationEffect.startComposition().addPrimitive(VibrationEffect.Composition.PRIMITIVE_TICK, 0.8f).compose())
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            v.vibrate(VibrationEffect.createOneShot(40, 140))
+        } else { @Suppress("DEPRECATION") v.vibrate(40) }
+    }
+
+    private fun hapticComplete(context: Context, enabled: Boolean = true) {
+        if (!enabled) return
+        val v = vibrator(context)
+        if (!v.hasVibrator()) return
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            v.vibrate(VibrationEffect.startComposition().addPrimitive(VibrationEffect.Composition.PRIMITIVE_TICK, 0.4f).addPrimitive(VibrationEffect.Composition.PRIMITIVE_CLICK, 1.0f, 60).compose())
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            v.vibrate(VibrationEffect.createWaveform(longArrayOf(0, 30, 60, 80), intArrayOf(0, 80, 0, 220), -1))
+        } else { @Suppress("DEPRECATION") v.vibrate(longArrayOf(0, 30, 60, 80), -1) }
+    }
+
+    @Suppress("DEPRECATION")
+    private fun vibrator(context: Context): Vibrator =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            (context.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager).defaultVibrator
+        } else {
+            context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+        }
+
+    companion object { const val EXTRA_OPEN_LIBRARY = "com.vakarux.instadownload.extra.OPEN_LIBRARY" }
 }
+
+@Preview(showBackground = true)
+@Composable
+fun InstagramDownloaderPreview() { InstaDownloadTheme { } }
