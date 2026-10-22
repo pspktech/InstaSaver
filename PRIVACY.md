@@ -1,7 +1,7 @@
 # Privacy Policy
 
-**InstaDownload** (package `com.vakarux.instadownload`), published by Vakarux / Orang Studio.
-Last updated: 2026-09-13.
+**InstaDownload** (package `com.vakarux.instadownload`).
+Last updated: 2026-10-22
 
 ## What we collect
 
@@ -22,7 +22,7 @@ Nothing. InstaDownload has no accounts, no analytics, no advertising, no crash r
 
 ## Third parties
 
-The only third party contacted is Instagram (Meta Platforms). Their handling of your requests is covered by [Meta's Privacy Policy](https://privacycenter.instagram.com/policy).
+The only third party contacted is Instagram (Meta Platforms). Their handling of your requests is covered by [
 
 ## Children
 
@@ -34,4 +34,4 @@ Updates to this policy are published in this repository. The date at the top ref
 
 ## Contact
 
-Open an issue at https://github.com/Orang-Studio/InstaDownload/issues.
+Open an issue at https://github.com/pspktech 
