@@ -8,11 +8,11 @@
 | < 7.0   | :x:                |
 
 ## Reporting a Vulnerability
-Report security problem at: https://github.com/Orang-Studio/InstaDownload/issues <br/>
+Report security problem at: https://github.com/pspktech <br/>
 Then you will get security tag as issue is security related, same for pull requests.
 <br/>
 
 
-If you are an android developer or understand kotlin you can fix it and pull request to: https://github.com/Orang-Studio/InstaDownload/pulls<br/>
+If you are an android developer or understand kotlin you can fix it and pull request to: https://github.com/pspktech<br/>
 
 Thanks 🧡
