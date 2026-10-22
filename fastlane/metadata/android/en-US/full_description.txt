@@ -16,6 +16,4 @@ Permissions:
 * Storage - to save files (Android 9 and below only)
 * Vibrate - for haptic feedback
 
-Privacy policy: https://github.com/Orang-Studio/InstaDownload/blob/main/PRIVACY.md
-
-Source code: https://github.com/Orang-Studio/InstaDownload
+Source code: https://github.com/pspktech 
