@@ -1,0 +1,42 @@
+name: Android CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch: # మాన్యువల్‌గా రన్ చేసుకోవడానికి
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: ./InstaDownload
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+
+    - name: Setup Gradle
+      uses: gradle/actions/setup-gradle@v4
+
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
+
+    # ఇక్కడ APK బిల్డ్ అవుతుంది
+    - name: Build Debug APK
+      run: ./gradlew assembleDebug
+
+    # బిల్డ్ అయిన APK ని GitHub లో అప్‌లోడ్ చేస్తుంది
+    - name: Upload APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: InstaSaver-Debug-APK
+        path: InstaDownload/app/build/outputs/apk/debug/*.apk
