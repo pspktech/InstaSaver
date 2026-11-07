@@ -346,6 +346,7 @@ class MainActivity : ComponentActivity() {
                 Column(modifier = Modifier.padding(24.dp)) {
 
                     val pasteDescription = stringResource(R.string.paste_clipboard_description)
+                    val clearUrlDescription = stringResource(R.string.clear_url_description)
                     OutlinedTextField(
                         value = url,
                         onValueChange = {
@@ -383,7 +384,7 @@ class MainActivity : ComponentActivity() {
                                 },
                                 modifier = Modifier.semantics {
                                     contentDescription = if (url.isNotBlank())
-                                        stringResource(R.string.clear_url_description)
+                                        clearUrlDescription
                                     else pasteDescription
                                 }
                             ) {
