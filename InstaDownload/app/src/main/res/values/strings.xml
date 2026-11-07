@@ -29,6 +29,7 @@
     <string name="url_field_label">Instagram URL</string>
     <string name="url_field_placeholder">https://www.instagram.com/reel/...</string>
     <string name="paste_clipboard_description">Paste from clipboard</string>
+    <string name="clear_url_description">Clear Instagram URL</string>
 
     <string name="story_not_supported_title">Stories aren\'t supported</string>
     <string name="story_not_supported_body">Instagram only serves Stories to logged-in accounts, so they can\'t be downloaded here. Reels and posts work as usual.</string>
@@ -81,7 +82,10 @@
     <string name="github_content_description">GitHub</string>
     <string name="instagram_content_description">Instagram</string>
     <string name="made_by_label">Open Source on GitHub</string>
-    <string name="follow_me_label">Follow me on Instagram @____madhu_patel____</string>
+    <string name="visit_website_label">Visit website</string>
+    <string name="contact_instagram_label">Contact us on Instagram</string>
+    <string name="website_content_description">Open InstaSaver website</string>
+    <string name="follow_me_label">Contact us on Instagram @____madhu_patel____</string>
     <string name="version_label_format">v%1$s</string>
     <string name="privacy_policy_label">Privacy policy</string>
 

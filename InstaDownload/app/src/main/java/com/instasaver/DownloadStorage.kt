@@ -1,4 +1,4 @@
-package com.vakarux.instadownload
+package com.instasaver
 
 import android.content.ContentValues
 import android.content.Context
@@ -60,7 +60,7 @@ private fun saveTo(
         val values = ContentValues().apply {
             put(MediaStore.MediaColumns.DISPLAY_NAME, fileName)
             put(MediaStore.MediaColumns.MIME_TYPE, mimeType)
-            put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS + "/InstaDownload")
+            put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS + "/InstaSaver")
             put(MediaStore.MediaColumns.IS_PENDING, 1)
             item.meta?.let {
                 put(MediaStore.MediaColumns.TITLE, it.caption?.take(100) ?: base)

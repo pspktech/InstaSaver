@@ -1,4 +1,4 @@
-package com.vakarux.instadownload.ui.theme
+package com.instasaver.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

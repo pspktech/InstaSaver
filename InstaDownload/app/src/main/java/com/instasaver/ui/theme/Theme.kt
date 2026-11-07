@@ -1,4 +1,4 @@
-package com.vakarux.instadownload
+package com.instasaver
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.*

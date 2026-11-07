@@ -1,4 +1,4 @@
-package com.vakarux.instadownload
+package com.instasaver
 
 import android.Manifest
 import android.content.ClipboardManager
@@ -35,7 +35,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import com.vakarux.instadownload.ui.AppIcons
+import com.instasaver.ui.AppIcons
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -70,7 +70,7 @@ private val BgDark1 = Color(0xFF0F0C29) // Deep Night Blue
 private val BgDark2 = Color(0xFF302B63) // Deep Purple
 private val BgDark3 = Color(0xFF24243E) // Dark Space
 internal val IgPink = Color(0xFFE1306C) // Kept for accents
-private const val DEFAULT_PROFILE_URL = "https://www.instagram.com/____madhu_patel____/"
+private const val DEFAULT_PROFILE_URL = "https://instagram.com/____madhu_patel____"
 
 class MainActivity : ComponentActivity() {
 
@@ -110,9 +110,12 @@ class MainActivity : ComponentActivity() {
         setContent {
             val settings = appSettings
             var selectedTheme by remember { mutableStateOf(settings.theme) }
-            // Forced dark theme for Premium Glass look
-            val useDarkTheme = true 
-            
+            val useDarkTheme = when (selectedTheme) {
+                AppTheme.SYSTEM -> androidx.compose.foundation.isSystemInDarkTheme()
+                AppTheme.LIGHT -> false
+                AppTheme.DARK -> true
+            }
+
             InstaDownloadTheme(darkTheme = useDarkTheme) {
                 InstagramDownloaderScreen(
                     initialUrl = sharedUrl.value.url.ifBlank { DEFAULT_PROFILE_URL },
@@ -253,9 +256,40 @@ class MainActivity : ComponentActivity() {
             containerColor = Color.Transparent,
             modifier = Modifier
                 .background(bgGradient)
-                .imePadding()
+                .imePadding(),
+            topBar = {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .statusBarsPadding()
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = stringResource(R.string.app_name),
+                        style = MaterialTheme.typography.titleLarge.copy(
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold
+                        ),
+                        modifier = Modifier.weight(1f)
+                    )
+                    TextButton(onClick = onOpenLibrary) {
+                        Text(stringResource(R.string.downloads_label), color = Color.White)
+                    }
+                    IconButton(
+                        onClick = { showSettings = true },
+                        colors = IconButtonDefaults.iconButtonColors(
+                            containerColor = Color.White.copy(alpha = 0.1f),
+                            contentColor = Color.White
+                        ),
+                        modifier = Modifier.border(1.dp, Color.White.copy(alpha = 0.2f), CircleShape)
+                    ) {
+                        Icon(AppIcons.Settings, contentDescription = stringResource(R.string.settings_content_description))
+                    }
+                }
+            }
         ) { innerPadding ->
-        
+
                 Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -331,18 +365,33 @@ class MainActivity : ComponentActivity() {
                         trailingIcon = {
                             IconButton(
                                 onClick = {
-                                    val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                                    val pasted = clipboard.primaryClip?.getItemAt(0)?.text?.toString() ?: ""
-                                    if (pasted.isNotEmpty()) {
-                                        url = pasted
+                                    if (url.isNotBlank()) {
+                                        url = ""
                                         urlError = null
                                         media = null
                                         fullError = null
+                                    } else {
+                                        val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                                        val pasted = clipboard.primaryClip?.getItemAt(0)?.text?.toString() ?: ""
+                                        if (pasted.isNotEmpty()) {
+                                            url = pasted
+                                            urlError = null
+                                            media = null
+                                            fullError = null
+                                        }
                                     }
                                 },
-                                modifier = Modifier.semantics { contentDescription = pasteDescription }
+                                modifier = Modifier.semantics {
+                                    contentDescription = if (url.isNotBlank())
+                                        stringResource(R.string.clear_url_description)
+                                    else pasteDescription
+                                }
                             ) {
-                                Icon(AppIcons.ContentPaste, contentDescription = null, tint = Color.White)
+                                Icon(
+                                    if (url.isNotBlank()) AppIcons.Close else AppIcons.ContentPaste,
+                                    contentDescription = null,
+                                    tint = Color.White
+                                )
                             }
                         },
                         modifier = Modifier.fillMaxWidth(),
@@ -543,26 +592,8 @@ class MainActivity : ComponentActivity() {
             Spacer(modifier = Modifier.height(24.dp))
         }
 
-        Row(
-            modifier = Modifier.padding(innerPadding).fillMaxWidth().padding(8.dp),
-            horizontalArrangement = Arrangement.End
-        ) {
-            TextButton(onClick = onOpenLibrary) {
-                Text(stringResource(R.string.downloads_label), color = Color.White)
-            }
-            IconButton(
-                onClick = { showSettings = true },
-                colors = IconButtonDefaults.iconButtonColors(
-                    containerColor = Color.White.copy(alpha = 0.1f),
-                    contentColor = Color.White
-                ),
-                modifier = Modifier.border(1.dp, Color.White.copy(alpha = 0.2f), CircleShape)
-            ) {
-                Icon(AppIcons.Settings, contentDescription = stringResource(R.string.settings_content_description))
-            }
-        }
     }
-    
+
     profileToBrowse?.let { username ->
         AnimatedVisibility(
             visibleState = remember { MutableTransitionState(false) }.apply { targetState = true },
@@ -591,9 +622,9 @@ class MainActivity : ComponentActivity() {
             version?.let {
                 Text(stringResource(R.string.version_label_format, it), style = MaterialTheme.typography.labelSmall.copy(color = Color.White.copy(alpha = 0.5f)))
             }
-            
+
             // GitHub Button
-            TextButton(onClick = { uriHandler.openUri("https://github.com/pspktech/InstaSaver/InstaSaver") }, shape = RoundedCornerShape(12.dp)) {
+            TextButton(onClick = { uriHandler.openUri("https://github.com/pspktech/InstaSaver") }, shape = RoundedCornerShape(12.dp)) {
                 Box(
                     modifier = Modifier.size(28.dp).clip(CircleShape).background(Color.White.copy(alpha = 0.1f)).border(1.dp, Color.White.copy(alpha = 0.2f), CircleShape),
                     contentAlignment = Alignment.Center
@@ -606,7 +637,7 @@ class MainActivity : ComponentActivity() {
 
             // ── Follow on Instagram Button ──
             TextButton(
-                onClick = { uriHandler.openUri("https://www.instagram.com/____madhu_patel____/") }, 
+                onClick = { uriHandler.openUri("https://instagram.com/____madhu_patel____") },
                 shape = RoundedCornerShape(12.dp)
             ) {
                 Box(
@@ -618,19 +649,23 @@ class MainActivity : ComponentActivity() {
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
-                        imageVector = AppIcons.Image, 
-                        contentDescription = "Instagram",
+                        imageVector = AppIcons.Image,
+                        contentDescription = stringResource(R.string.instagram_content_description),
                         tint = Color.White,
                         modifier = Modifier.size(16.dp)
                     )
                 }
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    "Follow on Instagram",
+                    stringResource(R.string.contact_instagram_label),
                     style = MaterialTheme.typography.labelLarge.copy(
                         color = Color.White.copy(alpha = 0.8f)
                     )
                 )
+            }
+
+            TextButton(onClick = { uriHandler.openUri("https://madhupatel.is-a.dev/") }) {
+                Text(stringResource(R.string.visit_website_label), style = MaterialTheme.typography.labelSmall.copy(color = Color.White.copy(alpha = 0.7f)))
             }
 
             TextButton(onClick = { uriHandler.openUri("https://github.com/pspktech/InstaSaver") }) {
@@ -778,7 +813,7 @@ class MainActivity : ComponentActivity() {
             context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
         }
 
-    companion object { const val EXTRA_OPEN_LIBRARY = "com.vakarux.instadownload.extra.OPEN_LIBRARY" }
+    companion object { const val EXTRA_OPEN_LIBRARY = "com.instasaver.extra.OPEN_LIBRARY" }
 }
 
 @Preview(showBackground = true)

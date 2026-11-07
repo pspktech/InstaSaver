@@ -1,4 +1,4 @@
-package com.vakarux.instadownload
+package com.instasaver
 
 import android.content.ActivityNotFoundException
 import android.net.Uri
@@ -79,7 +79,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import com.vakarux.instadownload.ui.AppIcons
+import com.instasaver.ui.AppIcons
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext

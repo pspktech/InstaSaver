@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "com.vakarux.instadownload"
+    namespace = "com.instasaver"
     compileSdk = 37
 
     defaultConfig {
-        applicationId = "com.vakarux.instadownload"
+        applicationId = "com.instasaver"
         minSdk = 24  // Android 7.0 (Nougat)
         targetSdk = 36
         versionCode = 20

@@ -1,4 +1,4 @@
-package com.vakarux.instadownload
+package com.instasaver
 
 import android.content.ClipData
 import android.content.Context

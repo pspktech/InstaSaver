@@ -1,4 +1,4 @@
-package com.vakarux.instadownload
+package com.instasaver
 
 import okhttp3.Cookie
 import okhttp3.CookieJar

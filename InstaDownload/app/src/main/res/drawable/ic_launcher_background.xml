@@ -9,13 +9,13 @@
         <aapt:attr name="android:fillColor">
             <gradient
                 android:type="linear"
-                android:startX="0"
-                android:startY="0"
-                android:endX="108"
-                android:endY="108">
-                <item android:offset="0" android:color="#FF833AB4" />
-                <item android:offset="0.5" android:color="#FFE1306C" />
-                <item android:offset="1" android:color="#FFF77737" />
+                android:startX="8"
+                android:startY="4"
+                android:endX="100"
+                android:endY="104">
+                <item android:offset="0" android:color="#FF5B21B6" />
+                <item android:offset="0.48" android:color="#FFE1306C" />
+                <item android:offset="1" android:color="#FFFF8A3D" />
             </gradient>
         </aapt:attr>
     </path>

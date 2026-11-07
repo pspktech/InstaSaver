@@ -1,4 +1,4 @@
-package com.vakarux.instadownload
+package com.instasaver
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -138,8 +138,8 @@ class QuickDownloadService : Service() {
     }
 
     companion object {
-        const val ACTION_DOWNLOAD = "com.vakarux.instadownload.action.QUICK_DOWNLOAD"
-        const val EXTRA_URL = "com.vakarux.instadownload.extra.URL"
+        const val ACTION_DOWNLOAD = "com.instasaver.action.QUICK_DOWNLOAD"
+        const val EXTRA_URL = "com.instasaver.extra.URL"
 
         private const val CHANNEL_ID = "quick_downloads"
         private const val RESULT_CHANNEL_ID = "quick_download_results"
